@@ -1,3 +1,5 @@
+-- Silvia Ureña Aparicio 2ºBach A
+
 -- Tablas de Socio, Entrega, Venta y Producto.
 
 CREATE TABLE SOCIO (
@@ -13,6 +15,7 @@ CREATE TABLE SOCIO (
   Correo_electrónico VARCHAR (50) NOT NULL,
 
   CONSTRAINT SOCIO_pk PRIMARY KEY(NIF)
+
 );
 
 CREATE TABLE  VENTAS (
@@ -27,11 +30,12 @@ CREATE TABLE ENTREGA (
   N_Entrega int auto_increment,
   Fecha_y_hora timestamp NOT NULL,
   Cantidad int NOT NULL,
-  Tipo_aceituna varchar (40) NOT NULL,
+  Tipo_aceituna ENUM('Árbol','Suelo') NOT NULL,
   Parcela_SIGPAC int NOT NULL,
   Recinto_SIGPAC int NOT NULL,
   
-  CONSTRAINT ENTREGA_pk PRIMARY KEY(N_Entrega)
+  CONSTRAINT ENTREGA_pk PRIMARY KEY(N_Entrega),
+  CONSTRAINT Entrega_Cant_ck CHECK (Cantidad>0)
 );
 
 CREATE TABLE  PRODUCTO (
@@ -39,7 +43,8 @@ CREATE TABLE  PRODUCTO (
   Denominación VARCHAR(30) NOT NULL,
   Precio float NOT NULL,
 
-  CONSTRAINT VENTAS_pk PRIMARY KEY(Código_aceite)
+  CONSTRAINT VENTAS_pk PRIMARY KEY(Código_aceite),
+  CONSTRAINT PRODUCTO_Precio_ck CHECK (Precio>0)
 );
 
 -- Tablas intermedias de Socio y Venta, Socio y Entrega y Entrega y Producto.
@@ -47,6 +52,8 @@ CREATE TABLE  PRODUCTO (
 CREATE TABLE SOCIO_VENTAS (
   NIF VARCHAR(9) NOT NULL,
   N_Ventas int NOT NULL,
+  
+  CONSTRAINT SOCIO_VENTAS_pk PRIMARY KEY(NIF,N_Ventas),
 
   CONSTRAINT SOCIO_VENTAS_NIF_fk 
     FOREIGN KEY(NIF) 
@@ -60,7 +67,9 @@ CREATE TABLE SOCIO_VENTAS (
 CREATE TABLE SOCIO_ENTREGA (
   NIF VARCHAR(9) NOT NULL,
   N_Entrega int NOT NULL,
-
+  
+  CONSTRAINT SOCIO_ENTREGA_pk PRIMARY KEY(NIF,N_Entrega),
+  
   CONSTRAINT SOCIO_ENTREGA_NIF_fk 
     FOREIGN KEY(NIF) 
     REFERENCES SOCIO (NIF),
@@ -70,10 +79,15 @@ CREATE TABLE SOCIO_ENTREGA (
     REFERENCES ENTREGA (N_Entrega)
 );
 
+
+
 CREATE TABLE ENTREGA_PRODUCTO (
   N_Entrega int NOT NULL,
   Código_aceite VARCHAR(5) NOT NULL,
   Cantidad float NOT NULL,
+  
+  CONSTRAINT ENTREGA_PRODUCTO_pk PRIMARY KEY(N_Entrega,Código_aceite),
+  CONSTRAINT ENTREGA_PRODUCTO_Cantidad_ck CHECK (Cantidad>0),
 
   CONSTRAINT ENTREGA_PRODUCTO_N_Entrega_fk 
     FOREIGN KEY(N_Entrega) 
@@ -104,4 +118,3 @@ SELECT * FROM PRODUCTO;
 SELECT * FROM SOCIO_VENTAS;
 SELECT * FROM SOCIO_ENTREGA;
 SELECT * FROM ENTREGA_PRODUCTO;
-
